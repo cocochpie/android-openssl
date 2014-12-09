@@ -60,7 +60,7 @@ for arch in ${archs[@]}; do
     xCFLAGS="-fPIC -DOPENSSL_PIC -DDSO_DLFCN -DHAVE_DLFCN_H -mandroid -I$ANDROID_DEV/include -B$ANDROID_DEV/$xLIB -O3 -fomit-frame-pointer -Wall"
 
     perl -pi -e 's/install: all install_docs install_sw/install: install_docs install_sw/g' Makefile.org
-    ./Configure shared -no-threads -no-asm -no-zlib -no-ssl2 -no-ssl3 -no-comp -no-hw -no-engine --openssldir=/usr/local/ssl/android-19/ $configure_platform $xCFLAGS
+    ./Configure shared no-threads no-asm no-zlib no-ssl2 no-ssl3 no-comp no-hw no-engine --openssldir=/usr/local/ssl/android-19/ $configure_platform $xCFLAGS
 
     make clean
     make depend
