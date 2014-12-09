@@ -6,8 +6,7 @@ set -e
 rm -rf prebuilt
 mkdir prebuilt
 
-#archs=(armeabi arm64-v8a mips mips64 x86 x86_64)
-archs=(x86)
+archs=(armeabi arm64-v8a mips mips64 x86 x86_64)
 
 for arch in ${archs[@]}; do
     xLIB="/lib"
@@ -56,21 +55,21 @@ for arch in ${archs[@]}; do
     echo "CROSS COMPILE ENV : $CROSS_COMPILE"
     cd openssl-1.0.1j
 
-    #export CFLAGS="-I${ANDROID_NDK_ROOT}/platforms/android-19/arch-$arch/usr/include"
-    #export LDFLAGS="-L${ANDROID_NDK_ROOT}/platforms/android-19/arch-$arch/usr/lib"
-    xCFLAGS="-DSHLIB_EXT=.so -fPIC -DOPENSSL_PIC -DDSO_DLFCN -DHAVE_DLFCN_H -mandroid -I$ANDROID_DEV/include -B$ANDROID_DEV/$xLIB -O3 -fomit-frame-pointer -Wall"
+    xCFLAGS="-DSHARED_EXTENSION=.so -fPIC -DOPENSSL_PIC -DDSO_DLFCN -DHAVE_DLFCN_H -mandroid -I$ANDROID_DEV/include -B$ANDROID_DEV/$xLIB -O3 -fomit-frame-pointer -Wall"
 
     perl -pi -e 's/install: all install_docs install_sw/install: install_docs install_sw/g' Makefile.org
     ./Configure shared no-threads no-asm no-zlib no-ssl2 no-ssl3 no-comp no-hw no-engine --openssldir=/usr/local/ssl/android-19/ $configure_platform $xCFLAGS
 
+    # patch god damn version number
+    perl -pi -e 's/SHLIB_EXT=\.so\.\$\(SHLIB_MAJOR\)\.\$\(SHLIB_MINOR\)/SHLIB_EXT=\.so/g' Makefile
     make clean
     make depend
     make all
 
-    file libcrypto.so.1.0.0
-    file libssl.so.1.0.0
-    cp libcrypto.so.1.0.0 ../prebuilt/${arch}/libcrypto.so
-    cp libssl.so.1.0.0 ../prebuilt/${arch}/libssl.so
+    file libcrypto.so
+    file libssl.so
+    cp libcrypto.so ../prebuilt/${arch}/libcrypto.so
+    cp libssl.so ../prebuilt/${arch}/libssl.so
     cd ..
 done
 exit 0
