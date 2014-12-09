@@ -60,8 +60,13 @@ for arch in ${archs[@]}; do
     perl -pi -e 's/install: all install_docs install_sw/install: install_docs install_sw/g' Makefile.org
     ./Configure shared no-threads no-asm no-zlib no-ssl2 no-ssl3 no-comp no-hw no-engine --openssldir=/usr/local/ssl/android-19/ $configure_platform $xCFLAGS
 
-    # patch god damn version number
+    # patch SONAME
+
     perl -pi -e 's/SHLIB_EXT=\.so\.\$\(SHLIB_MAJOR\)\.\$\(SHLIB_MINOR\)/SHLIB_EXT=\.so/g' Makefile
+    perl -pi -e 's/SHARED_LIBS_LINK_EXTS=\.so\.\$\(SHLIB_MAJOR\) \.so//g' Makefile
+    # quote injection for proper SONAME, fuck...
+    perl -pi -e 's/SHLIB_MAJOR=1/SHLIB_MAJOR=`/g' Makefile
+    perl -pi -e 's/SHLIB_MINOR=0.0/SHLIB_MINOR=`/g' Makefile
     make clean
     make depend
     make all
